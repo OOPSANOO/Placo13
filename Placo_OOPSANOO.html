@@ -1,0 +1,226 @@
+<html lang="ar" dir="rtl"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>حاسبة Placo الاحترافية V35 - Unified UI</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --facebook-color: #1877F2;
+            --dark-color: #2c3e50;
+            --accent-color: #e67e22;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --gray-color: #95a5a6;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 10px; color: #333; margin: 0; min-height: 100vh; }
+        .single-watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 12vw; font-weight: 900; color: rgba(0, 0, 0, 0.03); pointer-events: none; z-index: 0; user-select: none; text-transform: uppercase; }
+        .watermark-text-top { text-align: center; font-size: clamp(20px, 5vw, 28px); color: var(--dark-color); font-weight: 900; margin-bottom: 20px; letter-spacing: 3px; text-transform: uppercase; border-bottom: 4px solid var(--primary-color); padding-bottom: 10px; display: block; }
+        .card { background: rgba(255, 255, 255, 0.98); max-width: 1100px; margin: auto; padding: clamp(15px, 4vw, 30px); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: relative; z-index: 1; }
+
+        .social-float-container { position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+        .float-btn { display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.3s; }
+        .btn-contact-float { background-color: var(--primary-color); padding: 12px 20px; border-radius: 50px; font-size: 14px; gap: 8px; }
+        .btn-facebook-float { background-color: var(--facebook-color); width: 50px; height: 50px; border-radius: 50%; font-size: 22px; }
+        .float-btn:hover { transform: scale(1.1); filter: brightness(1.1); }
+
+        /* شريط الأدوات الموحد */
+        .toolbar { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
+            gap: 10px; margin-bottom: 25px; 
+        }
+
+        .btn { 
+            padding: 12px 10px; border: none; border-radius: 6px; cursor: pointer; 
+            font-weight: bold; font-size: 13px; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        
+        .btn-print { background-color: var(--dark-color); color: white; }
+        .btn-excel { background-color: var(--success-color); color: white; }
+        .btn-pdf { background-color: var(--danger-color); color: white; }
+        .btn-save { background-color: #f39c12; color: white; }
+        .btn-share { background-color: #9b59b6; color: white; }
+        
+        /* زر KS بنفس التنسيق */
+        .btn-ks { background-color: var(--gray-color); color: white; }
+        .btn-ks.active { background-color: var(--success-color); }
+
+        .area-section { background: #ebf5fb; padding: 20px; border-radius: 8px; margin: 20px 0; display: flex; flex-direction: column; gap: 15px; }
+        @media (min-width: 768px) { .area-section { flex-direction: row; justify-content: center; align-items: center; } }
+        .input-group { display: flex; flex-direction: column; flex: 1; }
+        .input-group label { font-size: 13px; margin-bottom: 5px; font-weight: bold; }
+        .area-input { padding: 12px; font-size: 16px; border: 2px solid var(--primary-color); border-radius: 6px; text-align: center; width: 100%; box-sizing: border-box; }
+
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: center; font-size: 14px; }
+        th { background-color: var(--primary-color); color: white; }
+        .edit-input { width: 70px; padding: 8px; text-align: center; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; }
+
+        .summary-container { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
+        .info-box { padding: 15px; background: var(--dark-color); color: white; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: clamp(16px, 4vw, 20px); }
+        .unit-price-box { background: var(--accent-color); }
+
+        @media print { .toolbar, .area-section, .edit-input, .social-float-container { display: none !important; } .card { box-shadow: none; border: none; } }
+    </style>
+</head>
+<body>
+    <div class="single-watermark">OOPSANOO</div>
+    <div class="watermark-text-top">BY OOPSANOO</div>
+    
+    <div class="social-float-container">
+        <a href="https://www.facebook.com/share/1GvGoYeHXJ/" target="_blank" class="float-btn btn-facebook-float"><span>f</span></a>
+        <a href="mailto:oopsanoo314@tutamail.com" class="float-btn btn-contact-float">📧 <span>CONTACT</span></a>
+    </div>
+
+    <div class="card">
+        <div class="header">
+            <h1 style="text-align:center;">حاسبة مستلزمات الجبس (Placo)</h1>
+            <div class="toolbar">
+                <button class="btn btn-print" onclick="window.print()">🖨️ طباعة</button>
+                <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel</button>
+                <button class="btn btn-pdf" onclick="exportToPDF()">📄 PDF</button>
+                <button class="btn btn-save" onclick="savePrices()">💾 حفظ</button>
+                <button class="btn btn-share" onclick="shareHTML()">🔗 مشاركة</button>
+                <!-- الزر الموحد لـ KS Doublage -->
+                <button id="ksButton" class="btn btn-ks" onclick="toggleKSDoublage()">❌ KS Doublage</button>
+            </div>
+        </div>
+        
+        <div class="area-section">
+            <div class="input-group"><label>الطول (M)</label><input type="number" id="length" value="6" class="area-input" oninput="calculateArea()"></div>
+            <div class="input-group"><label>الارتفاع (M)</label><input type="number" id="height" value="6" class="area-input" oninput="calculateArea()"></div>
+            <div class="input-group"><label>المساحة (M²)</label><input type="number" id="area" value="36" class="area-input" style="background:#fff; font-weight:bold;" oninput="initTable()"></div>
+        </div>
+        
+        <div class="table-responsive">
+            <table id="resultsTable">
+                <thead><tr><th>المادة</th><th>الوحدة</th><th>الكمية</th><th>السعر (DA)</th><th>الإجمالي</th></tr></thead>
+                <tbody id="tableBody"><tr><td style="text-align:right; font-size:12px;">KS BA13 3000 X 1200 X 12.5 MM</td><td>U</td>
+                    <td><input type="number" class="edit-input" value="10" oninput="updateRow(0, 'qty', this.value)"></td>
+                    <td><input type="number" class="edit-input" value="1180" oninput="updateRow(0, 'price', this.value)"></td>
+                    <td style="font-weight:bold;">11800</td></tr><tr><td style="text-align:right; font-size:12px;">MONTANT 48/35 3.00M</td><td>U</td>
+                    <td><input type="number" class="edit-input" value="76" oninput="updateRow(1, 'qty', this.value)"></td>
+                    <td><input type="number" class="edit-input" value="350" oninput="updateRow(1, 'price', this.value)"></td>
+                    <td style="font-weight:bold;">26600</td></tr><tr><td style="text-align:right; font-size:12px;">RAIL 48 3.00M</td><td>U</td>
+                    <td><input type="number" class="edit-input" value="33" oninput="updateRow(2, 'qty', this.value)"></td>
+                    <td><input type="number" class="edit-input" value="240" oninput="updateRow(2, 'price', this.value)"></td>
+                    <td style="font-weight:bold;">7920</td></tr><tr><td style="text-align:right; font-size:12px;">CHEVILLE A FRAPPE</td><td>U</td>
+                    <td><input type="number" class="edit-input" value="72" oninput="updateRow(3, 'qty', this.value)"></td>
+                    <td><input type="number" class="edit-input" value="4" oninput="updateRow(3, 'price', this.value)"></td>
+                    <td style="font-weight:bold;">288</td></tr><tr><td style="text-align:right; font-size:12px;">VIS TTPC 3.5 X 25 MM</td><td>Boite</td>
+                    <td><input type="number" class="edit-input" value="864" oninput="updateRow(4, 'qty', this.value)"></td>
+                    <td><input type="number" class="edit-input" value="1.1" oninput="updateRow(4, 'price', this.value)"></td>
+                    <td style="font-weight:bold;">950</td></tr><tr><td style="text-align:right; font-size:12px;">VIS TRPF 3.5X 9.5 MM</td><td>Boite</td>
+                    <td><input type="number" class="edit-input" value="108" oninput="updateRow(5, 'qty', this.value)"></td>
+                    <td><input type="number" class="edit-input" value="1.6" oninput="updateRow(5, 'price', this.value)"></td>
+                    <td style="font-weight:bold;">173</td></tr><tr><td style="text-align:right; font-size:12px;">Bande à joint</td><td>ML</td>
+                    <td><input type="number" class="edit-input" value="38" oninput="updateRow(6, 'qty', this.value)"></td>
+                    <td><input type="number" class="edit-input" value="4.8" oninput="updateRow(6, 'price', this.value)"></td>
+                    <td style="font-weight:bold;">182</td></tr><tr><td style="text-align:right; font-size:12px;">Enduit à joint</td><td>KG</td>
+                    <td><input type="number" class="edit-input" value="13" oninput="updateRow(7, 'qty', this.value)"></td>
+                    <td><input type="number" class="edit-input" value="120" oninput="updateRow(7, 'price', this.value)"></td>
+                    <td style="font-weight:bold;">1560</td></tr></tbody>
+            </table>
+        </div>
+        
+        <div class="summary-container">
+            <div class="info-box unit-price-box"><span>سعر المتر المربع:</span><span id="unitPriceArea">1,374.27 دج/م²</span></div>
+            <div class="info-box"><span>الإجمالي الكلي:</span><span id="grandTotal">49,473.6 دج</span></div>
+        </div>
+    </div>
+
+    <script>
+        let initialMaterials = [{"name":"KS BA13 3000 X 1200 X 12.5 MM","price":1180,"unit":"U","coeff_val":1},{"name":"MONTANT 48/35 3.00M","price":350,"unit":"U","coeff_val":2.1},{"name":"RAIL 48 3.00M","price":240,"unit":"U","coeff_val":0.9},{"name":"CHEVILLE A FRAPPE","price":4,"unit":"U","coeff_val":2},{"name":"VIS TTPC 3.5 X 25 MM","price":1.1,"unit":"Boite","coeff_val":24},{"name":"VIS TRPF 3.5X 9.5 MM","price":1.6,"unit":"Boite","coeff_val":3},{"name":"Bande à joint","price":4.8,"unit":"ML","coeff_val":1.05},{"name":"Enduit à joint","price":120,"unit":"KG","coeff_val":0.35}];
+        let currentData = [];
+        let isKSActive = false;
+
+        function calculateArea() {
+            const l = parseFloat(document.getElementById('length').value) || 0;
+            const h = parseFloat(document.getElementById('height').value) || 0;
+            document.getElementById('area').value = (l * h).toFixed(2);
+            initTable();
+        }
+
+        function toggleKSDoublage() {
+            isKSActive = !isKSActive;
+            const btn = document.getElementById('ksButton');
+            btn.innerText = isKSActive ? "✅ KS Doublage" : "❌ KS Doublage";
+            btn.classList.toggle('active', isKSActive);
+            initTable();
+        }
+
+        function initTable() {
+            const area = parseFloat(document.getElementById('area').value) || 0;
+            const doublingList = ['KS BA13 3000 X 1200 X 12.5 MM', 'VIS TTPC 3.5 X 25 MM', 'Bande à joint', 'Enduit à joint'];
+            const saved = localStorage.getItem('placo_saved_prices');
+            const priceMap = saved ? JSON.parse(saved) : {};
+
+            currentData = initialMaterials.map(item => {
+                let rawQty = (area * (item.coeff_val || 1.0));
+                if(item.name.includes('BA13')) rawQty = area / 3.6;
+                if(isKSActive && doublingList.includes(item.name)) rawQty = rawQty * 2;
+                let price = priceMap[item.name] !== undefined ? priceMap[item.name] : item.price;
+                return { ...item, qty: Math.ceil(rawQty), currentPrice: price };
+            });
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const area = parseFloat(document.getElementById('area').value) || 0;
+            let grandTotal = 0;
+            tbody.innerHTML = "";
+            currentData.forEach((item, index) => {
+                const rowTotal = item.qty * item.currentPrice;
+                grandTotal += rowTotal;
+                tbody.innerHTML += `<tr><td style="text-align:right; font-size:12px;">${item.name}</td><td>${item.unit}</td>
+                    <td><input type="number" class="edit-input" value="${item.qty}" oninput="updateRow(${index}, 'qty', this.value)"></td>
+                    <td><input type="number" class="edit-input" value="${item.currentPrice}" oninput="updateRow(${index}, 'price', this.value)"></td>
+                    <td style="font-weight:bold;">${rowTotal.toFixed(0)}</td></tr>`;
+            });
+            document.getElementById('grandTotal').innerText = grandTotal.toLocaleString() + " دج";
+            const unitPrice = area > 0 ? (grandTotal / area) : 0;
+            document.getElementById('unitPriceArea').innerText = unitPrice.toLocaleString(undefined, {maximumFractionDigits: 2}) + " دج/م²";
+        }
+
+        function updateRow(index, field, value) {
+            const val = parseFloat(value) || 0;
+            if (field === 'qty') currentData[index].qty = Math.round(val);
+            else currentData[index].currentPrice = val;
+            renderTable();
+        }
+
+        function savePrices() {
+            const priceMap = {};
+            currentData.forEach(item => { priceMap[item.name] = item.currentPrice; });
+            localStorage.setItem('placo_saved_prices', JSON.stringify(priceMap));
+            alert("تم حفظ الأسعار.");
+        }
+
+        function shareHTML() {
+            const currentPrices = currentData.map(item => ({ name: item.name, price: item.currentPrice, unit: item.unit, coeff_val: item.coeff_val }));
+            let fullHTML = document.documentElement.outerHTML;
+            fullHTML = fullHTML.replace(/let initialMaterials = \[.*?\];/s, `let initialMaterials = ${JSON.stringify(currentPrices)};`);
+            const blob = new Blob([fullHTML], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob); a.download = "Placo_OOPSANOO_V35.html"; a.click();
+        }
+
+        function exportToExcel() {
+            let csv = "\ufeffالمادة,الكمية,السعر,الإجمالي\n";
+            currentData.forEach(item => { csv += `${item.name},${item.qty},${item.currentPrice},${item.qty * item.currentPrice}\n`; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob); link.download = "Placo_OOPSANOO.csv"; link.click();
+        }
+
+        function exportToPDF() { window.print(); }
+
+        window.onload = calculateArea;
+    </script>
+
+
+</body></html>
