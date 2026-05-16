@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>حاسبة Placo الاحترافية - SARL BATISYSTEME</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #1a1d2b;
+            --card-bg: #24293e;
+            --input-bg: #1c2235;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --accent-blue: #3498db;
+            --save-btn: #f39c12;
+            --print-btn: #27ae60;
+            --pdf-btn: #e74c3c;
+            --waste-btn: #9b59b6;
+        }
+
+        .light-mode {
+            --bg-dark: #f0f2f5;
+            --card-bg: #ffffff;
+            --input-bg: #f8f9fa;
+            --text-main: #1a1d2b;
+            --text-dim: #636e72;
+            --accent-blue: #0984e3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 5px;
+            min-height: 100vh;
+            transition: background-color 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* حاوية التصدير لالتقاط الصورة بشكل منظم ونظيف للفاتورة */
+        .invoice-container {
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        .qr-container { display: none; text-align: center; }
+        #qrcode { background: white; padding: 5px; border-radius: 5px; display: inline-block; }
+
+        .top-icons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            position: absolute;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            font-size: 20px;
+        }
+
+        .fb-icon { background: #1877F2; }
+        .mode-icon { background: #f1c40f; color: #2c3e50; }
+
+        .header-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 10px 25px 10px;
+            border-radius: 0 0 30px 30px;
+            text-align: center;
+            margin: -5px -5px 15px -5px;
+            position: relative;
+        }
+
+        .header-title { font-size: 22px; font-weight: 900; margin: 0; }
+        .sub-title { font-size: 14px; opacity: 0.9; }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            margin-top: 15px; /* إعطاء مسافة علوية مريحة أسفل العنوان */
+            margin-bottom: 5px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 2px;
+            color: white;
+            font-weight: bold;
+            font-size: 9px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .btn-print { background: #2d3436; }
+        .btn-save { background: var(--save-btn); }
+        .btn-pdf { background: var(--pdf-btn); }
+        .btn-ks { background: var(--accent-blue); }
+        .btn-ks.active { background: var(--print-btn); }
+        .btn-waste { background: #576574; }
+        .btn-waste.active { background: var(--waste-btn); }
+
+        .input-section {
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .area-display {
+            grid-column: span 2;
+            background: var(--input-bg);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #3d445e;
+        }
+
+        .area-num { font-size: 24px; font-weight: 900; color: var(--text-main); background:none; border:none; text-align:center; width:100%; outline:none; }
+
+        .small-input {
+            background: var(--input-bg);
+            border: 1px solid #3d445e;
+            border-radius: 8px;
+            padding: 8px;
+            color: var(--text-main);
+            text-align: center;
+            font-size: 16px;
+            width: 100%;
+            outline: none;
+        }
+
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 5px;
+            width: 100%;
+        }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { color: var(--text-dim); font-size: 10px; padding: 8px 2px; border-bottom: 1px solid #3d445e; }
+        td { padding: 10px 2px; border-bottom: 1px solid #2d334d; font-size: 11px; text-align: center; color: var(--text-main); }
+
+        .clickable-material {
+            cursor: pointer;
+            background: rgba(52, 152, 219, 0.15);
+            font-weight: bold;
+            border-radius: 4px;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .clickable-material:hover {
+            background: rgba(52, 152, 219, 0.3);
+        }
+
+        .edit-input {
+            background: var(--input-bg);
+            border: 1px solid #3d445e;
+            border-radius: 5px;
+            color: #2ecc71;
+            width: 90%;
+            padding: 5px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            outline: none;
+        }
+
+        /* وضع التصدير لالتقاط الفاتورة بشكل نظيف */
+        .export-mode {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+        .export-mode .header-gradient {
+            background: #f8f9fa !important;
+            color: #000000 !important;
+            border: 1px solid #ddd;
+        }
+        .export-mode .header-title { color: #2c3e50 !important; }
+        .export-mode .input-section, .export-mode .table-card, .export-mode .info-card {
+            background: #ffffff !important;
+            border: 1px solid #eee !important;
+        }
+        .export-mode .edit-input { color: #000000 !important; border: none !important; background: none !important; }
+        .export-mode .area-num { color: #000000 !important; }
+        .export-mode th { color: #555 !important; border-bottom: 2px solid #333 !important; }
+        .export-mode td { border-bottom: 1px solid #eee !important; color: #000000 !important; }
+        .export-mode .clickable-material { background: none !important; }
+        .export-mode #grandTotal, .export-mode #unitPriceArea { color: #c0392b !important; }
+        .export-mode .qr-container { display: block !important; position: absolute; top: 15px; left: 15px; }
+        /* إخفاء شريط الأدوات دائماً أثناء تصدير اللقطة */
+        .export-mode .toolbar { display: none !important; } 
+    </style>
+</head>
+<body>
+
+    <div class="top-icons">
+        <div class="icon-btn mode-icon" onclick="toggleDarkMode()">🌓</div>
+        <a href="https://www.facebook.com/abdelhamid31.mansouri31?mibextid=ZbWKwL" target="_blank" class="icon-btn fb-icon">f</a>
+    </div>
+
+    <div id="invoiceBlock" class="invoice-container">
+        
+        <div class="header-gradient">
+            <div class="qr-container">
+                <div id="qrcode"></div>
+            </div>
+            <div class="header-title">BY OOPSANOO</div>
+            <div class="sub-title">SARL BATISYSTEME - Oran</div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-print" onclick="captureAppScreen()">📸<span>صورة</span></button>
+            <button class="btn btn-save" onclick="savePrices()">💾<span>حفظ</span></button>
+            <button class="btn btn-pdf" onclick="captureAppScreen()">📄<span>PDF</span></button>
+            <button id="wasteBtn" class="btn btn-waste" onclick="cycleWaste()">♻️<span id="wasteLabel">الفاقد</span></button>
+            <button id="ksButton" class="btn btn-ks" onclick="toggleKSDoublage()">❌<span>KS Doublage</span></button>
+        </div>
+
+        <div class="input-section" style="margin-top: 15px;">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+                <label style="font-size:10px; color:var(--text-dim); text-align:center;">الطول (M)</label>
+                <input type="number" id="length" value="6" class="small-input" oninput="calculateArea()">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+                <label style="font-size:10px; color:var(--text-dim); text-align:center;">الارتفاع (M)</label>
+                <input type="number" id="height" value="6" class="small-input" oninput="calculateArea()">
+            </div>
+            <div class="area-display">
+                <input type="number" id="area" value="36" class="area-num" oninput="initTable()">
+                <div style="color:var(--text-dim); font-size:10px;">المساحة الإجمالية (M²)</div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:35%">المادة</th>
+                        <th style="width:20%">الكمية</th>
+                        <th style="width:22%">السعر</th>
+                        <th style="width:23%">إجمالي</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px;">
+            <div class="info-card" style="background:var(--card-bg); padding:10px; border-radius:10px; text-align:center;">
+                <span style="display:block; font-size:9px; color:var(--text-dim);">المتوسط/م²</span>
+                <b id="unitPriceArea" style="font-size:15px;">0</b>
+            </div>
+            <div class="info-card" style="background:var(--card-bg); padding:10px; border-radius:10px; text-align:center;">
+                <span style="display:block; font-size:9px; color:var(--text-dim);">الإجمالي الكلي</span>
+                <b id="grandTotal" style="font-size:15px;">0</b>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new QRCode(document.getElementById("qrcode"), {
+            text: "https://www.facebook.com/abdelhamid31.mansouri31?mibextid=ZbWKwL",
+            width: 60, height: 60, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+        });
+
+        let initialMaterials = [
+            {
+                "name": "KS BA13 3M", "price": 1180, "coeff_val": 1, "isClickable": true,
+                "altName": "KH BA13 3M", "altPrice": 1680
+            },
+            {
+                "name": "MONTANT 48 3.00M", "price": 350, "coeff_val": 0.65, "isClickable": true,
+                "altName": "MONTANT 70 3.00M", "altPrice": 450
+            },
+            {
+                "name": "RAIL 48 3.00M", "price": 245, "coeff_val": 0.23, "isClickable": true,
+                "altName": "RAIL 70 3.00M", "altPrice": 375
+            },
+            {"name":"CHEVILLE 6MM","price":4,"coeff_val":2},
+            {"name":"VIS 3.5 X 25 MM","price":1.1,"coeff_val":36},
+            {"name":"VIS 9.5MM","price":1.6,"coeff_val":3},
+            {"name":"Bande à joint","price":4.8,"coeff_val":1.05},
+            {"name":"Enduit à joint","price":120,"coeff_val":0.35}
+        ];
+        
+        let currentData = [];
+        let isKSActive = false;
+        let wasteLevel = 0;
+        const wasteRates = [0, 0.02, 0.05, 0.10];
+        const wasteText = ["الفاقد", "فاقد 2%", "فاقد 5%", "فاقد 10%"];
+
+        function roundEnduit(q) {
+            if (q <= 0) return 0;
+            if (q <= 5) return 5; if (q <= 10) return 10; if (q <= 15) return 15;
+            if (q <= 25) return 25; if (q <= 50) return 50; if (q <= 75) return 75;
+            if (q <= 100) return 100;
+            return Math.ceil(q / 25) * 25;
+        }
+
+        function roundVis(q) {
+            if (q <= 0) return 0;
+            if (q <= 100) return 100; if (q <= 200) return 200;
+            if (q <= 300) return 300; if (q <= 400) return 400;
+            if (q <= 1000) return 1000;
+            if (q > 1100 && q <= 2100) return 2000;
+            if (q > 2100 && q <= 3100) return 3000;
+            return Math.ceil(q / 1000) * 1000;
+        }
+
+        function roundBande(q) {
+            if (q <= 0) return 0;
+            if (q <= 23) return 23; if (q <= 45) return 45;
+            if (q <= 75) return 75; if (q <= 150) return 150;
+            return Math.ceil(q);
+        }
+
+        function calculateArea() {
+            const l = parseFloat(document.getElementById('length').value) || 0;
+            const h = parseFloat(document.getElementById('height').value) || 0;
+            document.getElementById('area').value = (l * h).toFixed(2);
+            initTable();
+        }
+
+        function cycleWaste() {
+            wasteLevel = (wasteLevel + 1) % 4;
+            document.getElementById('wasteLabel').innerText = wasteText[wasteLevel];
+            document.getElementById('wasteBtn').classList.toggle('active', wasteLevel > 0);
+            initTable();
+        }
+
+        function toggleDarkMode() { document.body.classList.toggle('light-mode'); }
+
+        function toggleKSDoublage() {
+            isKSActive = !isKSActive;
+            document.getElementById('ksButton').innerHTML = isKSActive ? "✅<span>KS Doublage</span>" : "❌<span>KS Doublage</span>";
+            document.getElementById('ksButton').classList.toggle('active', isKSActive);
+            initTable();
+        }
+
+        function toggleMaterialType(index) {
+            let item = currentData[index];
+            if (!item.isClickable) return;
+
+            let tempName = item.name;
+            let tempPrice = item.price;
+
+            item.name = item.altName;
+            item.price = item.altPrice;
+
+            item.altName = tempName;
+            item.altPrice = tempPrice;
+
+            item.currentPrice = item.price;
+
+            renderTable();
+        }
+
+        function initTable() {
+            const area = parseFloat(document.getElementById('area').value) || 0;
+            const waste = 1 + wasteRates[wasteLevel];
+            let ba13QtyRaw = (area / 3.6) * (isKSActive ? 2 : 1) * waste;
+            let ba13QtyFinal = Math.ceil(ba13QtyRaw);
+
+            currentData = initialMaterials.map((item, idx) => {
+                let existingItem = currentData[idx];
+                let activeName = existingItem ? existingItem.name : item.name;
+                let activePrice = existingItem ? existingItem.price : item.price;
+                let activeAltName = existingItem ? existingItem.altName : item.altName;
+                let activeAltPrice = existingItem ? existingItem.altPrice : item.altPrice;
+
+                let finalQty;
+                if (activeName.includes("BA13 3M")) finalQty = ba13QtyFinal;
+                else if (activeName.includes("VIS 3.5 X 25 MM")) finalQty = roundVis(ba13QtyFinal * 36);
+                else {
+                    let raw = area * item.coeff_val;
+                    if(isKSActive && ['Bande', 'Enduit'].some(k => activeName.includes(k))) raw *= 2;
+                    raw *= waste;
+                    if (activeName.includes('Enduit')) finalQty = roundEnduit(raw);
+                    else if (activeName.includes('Bande')) finalQty = roundBande(raw);
+                    else finalQty = Math.ceil(raw);
+                }
+
+                return { 
+                    ...item, 
+                    name: activeName, 
+                    price: activePrice,
+                    altName: activeAltName,
+                    altPrice: activeAltPrice,
+                    qty: finalQty, 
+                    currentPrice: activePrice 
+                };
+            });
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = "";
+            currentData.forEach((item, index) => {
+                let nameTdCell = item.isClickable 
+                    ? `<td style="text-align:right;" class="clickable-material" onclick="toggleMaterialType(${index})">🔄 ${item.name}</td>`
+                    : `<td style="text-align:right;">${item.name}</td>`;
+
+                tbody.innerHTML += `
+                    <tr>
+                        ${nameTdCell}
+                        <td><input type="number" class="edit-input" value="${item.qty}" oninput="updateValue(${index}, 'qty', this.value)"></td>
+                        <td><input type="number" class="edit-input" style="color:#3498db" value="${item.currentPrice}" oninput="updateValue(${index}, 'price', this.value)"></td>
+                        <td id="total-${index}" style="font-weight:bold">${(item.qty * item.currentPrice).toLocaleString()}</td>
+                    </tr>`;
+            });
+            updateSummary();
+        }
+
+        function updateValue(i, f, v) {
+            const val = parseFloat(v) || 0;
+            if (f === 'qty') currentData[i].qty = val;
+            else {
+                currentData[i].currentPrice = val;
+                currentData[i].price = val;
+            }
+            
+            document.getElementById(`total-${i}`).innerText = (currentData[i].qty * currentData[i].currentPrice).toLocaleString();
+            updateSummary();
+        }
+
+        function updateSummary() {
+            let grandTotal = 0;
+            currentData.forEach(item => { grandTotal += (item.qty * item.currentPrice); });
+            const area = parseFloat(document.getElementById('area').value) || 0;
+            document.getElementById('grandTotal').innerText = Math.round(grandTotal).toLocaleString() + " DA";
+            document.getElementById('unitPriceArea').innerText = area > 0 ? Math.round(grandTotal/area).toLocaleString() + " DA" : "0 DA";
+        }
+
+        function captureAppScreen() {
+            const element = document.getElementById("invoiceBlock");
+            
+            element.classList.add("export-mode");
+            document.body.style.backgroundColor = "#ffffff";
+
+            html2canvas(element, {
+                useCORS: true,
+                scale: 3, 
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                element.classList.remove("export-mode");
+                document.body.style.backgroundColor = "";
+
+                const imgData = canvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.download = `فاتورة_بلاكو_${document.getElementById('area').value}م2.png`;
+                link.href = imgData;
+                link.click();
+            }).catch(err => {
+                element.classList.remove("export-mode");
+                document.body.style.backgroundColor = "";
+                alert("حدث خطأ أثناء تصدير الصورة، يرجى التحقق من صلاحيات التخزين للتطبيق.");
+            });
+        }
+
+        function savePrices() { alert("تم حفظ الأسعار."); }
+        window.onload = calculateArea;
+    </script>
+</body>
+</html>
+
