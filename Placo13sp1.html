@@ -1,260 +1,4 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حاسبة Placo الاحترافية - SARL BATISYSTEME</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-    <style>
-        :root {
-            --bg-dark: #1a1d2b;
-            --card-bg: #24293e;
-            --input-bg: #1c2235;
-            --text-main: #ffffff;
-            --text-dim: #a0a0a0;
-            --accent-blue: #3498db;
-            --save-btn: #f39c12;
-            --print-btn: #27ae60;
-            --pdf-btn: #e74c3c;
-            --waste-btn: #9b59b6;
-            
-            --input-fields-bg: #1e2538;
-            --area-border-color: #2ecc71;
-            --area-text-color: #2ecc71;
-        }
 
-        .light-mode {
-            --bg-dark: #f0f2f5;
-            --card-bg: #ffffff;
-            --input-bg: #f8f9fa;
-            --text-main: #1a1d2b;
-            --text-dim: #636e72;
-            --accent-blue: #0984e3;
-            --input-fields-bg: #f0f2f5;
-            --area-border-color: #218c74;
-            --area-text-color: #218c74;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            margin: 0;
-            padding: 5px;
-            min-height: 100vh;
-            transition: background-color 0.3s;
-        }
-
-        .invoice-container {
-            padding: 10px;
-            border-radius: 15px;
-            position: relative;
-        }
-
-        .qr-container { display: none; text-align: center; }
-        #qrcode { background: white; padding: 5px; border-radius: 5px; display: inline-block; }
-
-        .top-icons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            position: absolute;
-            width: 100%;
-            box-sizing: border-box;
-            z-index: 10;
-        }
-
-        .icon-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            text-decoration: none;
-            color: white;
-            font-size: 20px;
-        }
-
-        .fb-icon { background: #1877F2; }
-        .mode-icon { background: #f1c40f; color: #2c3e50; }
-
-        .header-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px 10px 25px 10px;
-            border-radius: 0 0 30px 30px;
-            text-align: center;
-            margin: -5px -5px 15px -5px;
-            position: relative;
-        }
-
-        .header-title { font-size: 22px; font-weight: 900; margin: 0; }
-        .sub-title { font-size: 14px; opacity: 0.9; }
-
-        .toolbar {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
-            margin-bottom: 15px;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 8px;
-            padding: 8px 2px;
-            color: white;
-            font-weight: bold;
-            font-size: 9px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-        }
-
-        .btn-print { background: var(--print-btn); }
-        .btn-save { background: var(--save-btn); }
-        .btn-pdf { background: var(--pdf-btn); }
-        .btn-ks { background: var(--accent-blue); }
-        .btn-ks.active { background: #e74c3c; }
-        .btn-waste { background: #576574; }
-        .btn-waste.active { background: var(--waste-btn); }
-
-        .input-section {
-            background: var(--card-bg);
-            padding: 12px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .input-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            background: var(--input-fields-bg);
-            padding: 8px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .area-display {
-            grid-column: span 2;
-            background: var(--input-bg);
-            padding: 14px 10px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1.5px solid var(--area-border-color);
-            box-sizing: border-box;
-        }
-
-        .area-num { 
-            font-size: 26px; 
-            font-weight: 900; 
-            color: var(--area-text-color); 
-            background: none; 
-            border: none; 
-            text-align: center; 
-            width: 100%; 
-            outline: none;
-            display: inline-block;
-            line-height: 1.2;
-            padding: 2px 0;
-            overflow: visible;
-        }
-
-        .small-input {
-            background: var(--input-bg);
-            border: 1px solid #3d445e;
-            border-radius: 8px;
-            padding: 8px;
-            color: var(--text-main);
-            text-align: center;
-            font-size: 16px;
-            width: 100%;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        .table-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 5px;
-            width: 100%;
-        }
-
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { color: var(--text-dim); font-size: 10px; padding: 8px 2px; border-bottom: 1px solid #3d445e; }
-        td { padding: 10px 2px; border-bottom: 1px solid #2d334d; font-size: 11px; text-align: center; color: var(--text-main); }
-
-        .clickable-material {
-            cursor: pointer;
-            background: rgba(52, 152, 219, 0.12);
-            font-weight: bold;
-            border-radius: 6px;
-            transition: background 0.2s;
-            user-select: none;
-        }
-
-        .edit-input {
-            background: var(--input-bg);
-            border: 1px solid #3d445e;
-            border-radius: 5px;
-            color: #2ecc71;
-            width: 90%;
-            padding: 5px 0;
-            text-align: center;
-            font-weight: bold;
-            font-size: 12px;
-            outline: none;
-        }
-
-        /* الإعدادات الخاصة بتهيئة الألوان الصافية عند تصدير الـ PDF ليظهر بشكل رسمي ممتاز */
-        .export-mode {
-            background: #ffffff !important;
-            color: #000000 !important;
-        }
-        .export-mode .header-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            color: #ffffff !important;
-        }
-        .export-mode .input-section, .export-mode .table-card, .export-mode .info-card {
-            background: #ffffff !important;
-            border: 1px solid #eee !important;
-        }
-        .export-mode .input-wrapper {
-            background: #f8f9fa !important;
-            border: 1px solid #ddd !important;
-        }
-        .export-mode .area-display {
-            background: #f1f2f6 !important;
-            border: 1.5px solid var(--area-border-color) !important;
-        }
-        .export-mode .small-input, .export-mode .area-num { color: #000000 !important; }
-        .export-mode .edit-input { 
-            color: #218c74 !important; 
-            border: none !important; 
-            background: transparent !important; 
-        }
-        .export-mode th { color: #555 !important; border-bottom: 2px solid #333 !important; }
-        .export-mode td { border-bottom: 1px solid #eee !important; color: #000000 !important; }
-        .export-mode .clickable-material { background: none !important; }
-        .export-mode #grandTotal, .export-mode #unitPriceArea { color: #c0392b !important; }
-        .export-mode .qr-container { display: block !important; position: absolute; top: 15px; left: 15px; }
-        .export-mode .toolbar, .export-mode .top-icons { display: none !important; }
-
-        @media print {
-            body { background: white !important; color: black !important; padding: 0; }
-            .toolbar, .top-icons, .mode-icon, .fb-icon { display: none !important; }
-            .qr-container { display: block !important; position: absolute; top: 15px; right: 15px; }
-            .header-gradient { background: #f8f9fa !important; color: black !important; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 20px; }
             .header-title { color: #2c3e50 !important; }
             .input-section, .table-card, .info-card { background: white !important; border: 1px solid #eee !important; }
             .edit-input { color: black !important; border:none; }
@@ -267,71 +11,179 @@
 </head>
 <body>
 
-    <div class="top-icons">
-        <div class="icon-btn mode-icon" onclick="toggleDarkMode()">🌓</div>
-        <a href="https://www.facebook.com/abdelhamid31.mansouri31?mibextid=ZbWKwL" target="_blank" class="icon-btn fb-icon">f</a>
+    <div id="activationOverlay">
+        <div class="activation-card">
+            <h3 onclick="triggerAdminCounter()" style="cursor: pointer; user-select: none;">نظام الحماية الرقمي 🔑</h3>
+            <p style="font-size: 13px; color: #94a3b8; margin: 5px 0;">معرّف الجهاز الفريد الخاص بك:</p>
+            
+            <div id="deviceIdDisplay" class="device-id-box">جاري التوليد...</div>
+            
+            <input type="text" id="activationCodeInput" class="activation-input" placeholder="أدخل كود التفعيل هنا">
+            <button class="btn-activate" onclick="validateActivation()">تفعيل التطبيق الآن</button>
+            
+            <div class="contact-text">
+                لطلب خدمة تفعيل التطبيق أو المزيد من الاستفسارات اتصل على الرقم التالي:<br>
+                <a href="tel:0773992807" class="phone-link">0773992807</a>
+            </div>
+
+            <div id="adminGenBox" class="admin-generator-box">
+                <h4 style="color:#3b82f6; margin: 5px 0; font-size:14px;">لوحة المسؤول السرية 🛠️</h4>
+                <input type="text" id="adminIdInput" class="activation-input" style="border-color:#f39c12; margin-bottom:8px;" placeholder="أدخل رمز جهاز العامل">
+                <button class="btn-activate" style="background-color:#3b82f6; color:white; padding:8px;" onclick="adminGenerateCode()">توليد الكود فوراً</button>
+                <div id="adminResultDisplay" style="margin-top:10px; font-weight:bold; color:#2ecc71; font-family:monospace; font-size:16px; user-select:all;"></div>
+            </div>
+        </div>
     </div>
 
-    <div id="invoiceBlock" class="invoice-container">
-
-        <div class="header-gradient">
-            <div class="qr-container">
-                <div id="qrcode"></div>
-            </div>
-            <div class="header-title">BY OOPSANOO</div>
-            <div class="sub-title">SARL BATISYSTEME - Oran</div>
+    <div id="mainAppContent" style="display: none;">
+        <div class="top-icons">
+            <div class="icon-btn mode-icon" onclick="toggleDarkMode()">🌓</div>
+            <a href="https://www.facebook.com/abdelhamid31.mansouri31?mibextid=ZbWKwL" target="_blank" class="icon-btn fb-icon">f</a>
         </div>
 
-        <div class="toolbar">
-            <button class="btn btn-print" onclick="window.print()">🖨️<span>طباعة</span></button>
-            <button class="btn btn-save" onclick="savePrices()">💾<span>حفظ</span></button>
-            <button class="btn btn-pdf" onclick="generateInvoicePDF()">📄<span>PDF</span></button>
-            <button id="wasteBtn" class="btn btn-waste" onclick="cycleWaste()">♻️<span id="wasteLabel">الفاقد</span></button>
-            <button id="ksButton" class="btn btn-ks" onclick="toggleKSDoublage()">❌<span>KS Doublage</span></button>
-        </div>
+        <div id="invoiceBlock" class="invoice-container">
+            <div class="header-gradient">
+                <div class="qr-container">
+                    <div id="qrcode"></div>
+                </div>
+                <div class="header-title">BY OOPSANOO</div>
+                <div class="sub-title">SARL BATISYSTEME - Oran</div>
+            </div>
 
-        <div class="input-section">
-            <div class="input-wrapper">
-                <label style="font-size:10px; color:var(--text-dim); text-align:center;">الطول (M)</label>
-                <input type="number" id="length" value="6" class="small-input" oninput="calculateArea()">
+            <div class="toolbar">
+                <button class="btn btn-print" onclick="window.print()">🖨️<span>طباعة</span></button>
+                <button class="btn btn-save" onclick="savePrices()">💾<span>حفظ</span></button>
+                <button class="btn btn-pdf" onclick="generateInvoicePDF()">📄<span>PDF</span></button>
+                <button id="wasteBtn" class="btn btn-waste" onclick="cycleWaste()">♻️<span id="wasteLabel">الفاقد</span></button>
+                <button id="ksButton" class="btn btn-ks" onclick="toggleKSDoublage()">❌<span>KS Doublage</span></button>
             </div>
-            <div class="input-wrapper">
-                <label style="font-size:10px; color:var(--text-dim); text-align:center;">الارتفاع (M)</label>
-                <input type="number" id="height" value="6" class="small-input" oninput="calculateArea()">
-            </div>
-            <div class="area-display">
-                <div id="area" contenteditable="true" class="area-num" oninput="initTable()">36.00</div>
-                <div style="color:var(--text-dim); font-size:10px; font-weight: bold; margin-top: 4px;">المساحة الإجمالية (M²)</div>
-            </div>
-        </div>
 
-        <div class="table-card">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width:38%">المادة</th>
-                        <th style="width:18%">الكمية</th>
-                        <th style="width:20%">السعر</th>
-                        <th style="width:24%">إجمالي</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px;">
-            <div class="info-card" style="background:var(--card-bg); padding:10px; border-radius:10px; text-align:center;">
-                <span style="display:block; font-size:9px; color:var(--text-dim);">المتوسط/م²</span>
-                <b id="unitPriceArea" style="font-size:15px;">0</b>
+            <div class="input-section">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-size:10px; color:var(--text-dim); text-align:center;">الطول (M)</label>
+                    <input type="number" id="length" value="6" class="small-input" oninput="calculateArea()">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-size:10px; color:var(--text-dim); text-align:center;">الارتفاع (M)</label>
+                    <input type="number" id="height" value="6" class="small-input" oninput="calculateArea()">
+                </div>
+                <div class="area-display">
+                    <input type="number" id="area" value="36" class="area-num" oninput="initTable()">
+                    <div style="color:var(--text-dim); font-size:10px;">المساحة الإجمالية (M²)</div>
+                </div>
             </div>
-            <div class="info-card" style="background:var(--card-bg); padding:10px; border-radius:10px; text-align:center;">
-                <span style="display:block; font-size:9px; color:var(--text-dim);">الإجمالي الكلي</span>
-                <b id="grandTotal" style="font-size:15px;">0</b>
+
+            <div class="table-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:46%">المادة</th>
+                            <th style="width:16%">الكمية</th>
+                            <th style="width:18%">السعر</th>
+                            <th style="width:20%">إجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px;">
+                <div class="info-card" style="background:var(--card-bg); padding:10px; border-radius:10px; text-align:center;">
+                    <span style="display:block; font-size:9px; color:var(--text-dim);">المتوسط/م²</span>
+                    <b id="unitPriceArea" style="font-size:15px;">0</b>
+                </div>
+                <div class="info-card" style="background:var(--card-bg); padding:10px; border-radius:10px; text-align:center;">
+                    <span style="display:block; font-size:9px; color:var(--text-dim);">الإجمالي الكلي</span>
+                    <b id="grandTotal" style="font-size:15px;">0</b>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // ==================== محرك الحماية والتفعيل الرقمي المدمج ====================
+        
+        function getHashCode(str) {
+            let hash = 0;
+            if (str.length === 0) return hash;
+            for (let i = 0; i < str.length; i++) {
+                const chr = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + chr;
+                hash |= 0;
+            }
+            return hash;
+        }
+
+        function getDeviceFingerprint() {
+            let savedId = localStorage.getItem('sarl_batisysteme_device_id');
+            if (!savedId) {
+                const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                let randomToken = '';
+                for (let i = 0; i < 8; i++) {
+                    randomToken += characters.charAt(Math.floor(Math.random() * characters.length));
+                }
+                savedId = "BAT-" + randomToken;
+                localStorage.setItem('sarl_batisysteme_device_id', savedId);
+            }
+            return savedId;
+        }
+
+        function getCorrectActivationCode(deviceId) {
+            const hashAbs = Math.abs(getHashCode(deviceId.trim().toUpperCase()));
+            const secretNumber = hashAbs ^ 7777;
+            return "BAT-" + secretNumber;
+        }
+
+        function checkActivationStatus() {
+            const isActivated = localStorage.getItem('sarl_batisysteme_is_activated');
+            const deviceId = getDeviceFingerprint();
+            document.getElementById('deviceIdDisplay').innerText = deviceId;
+
+            if (isActivated === 'true') {
+                document.getElementById('activationOverlay').style.display = 'none';
+                document.getElementById('mainAppContent').style.display = 'block';
+                calculateArea();
+            }
+        }
+
+        function validateActivation() {
+            const deviceId = getDeviceFingerprint();
+            const inputCode = document.getElementById('activationCodeInput').value.trim();
+            const correctCode = getCorrectActivationCode(deviceId);
+
+            if (inputCode === correctCode) {
+                localStorage.setItem('sarl_batisysteme_is_activated', 'true');
+                alert("🎉 تم التفعيل بنجاح! أهلاً بك في تطبيق BATISYSTÈME.");
+                document.getElementById('activationOverlay').style.display = 'none';
+                document.getElementById('mainAppContent').style.display = 'block';
+                calculateArea();
+            } else {
+                alert("❌ كود التفعيل غير صحيح! يرجى التواصل مع الدعم الفني.");
+            }
+        }
+
+        // ميزة المسؤول السرية لفتح لوحة توليد الأكواد من الهاتف مباشرة
+        let adminClickCount = 0;
+        function triggerAdminCounter() {
+            adminClickCount++;
+            if (adminClickCount >= 3) {
+                document.getElementById('adminGenBox').style.style.display = 'block';
+                adminClickCount = 0;
+            }
+        }
+
+        function adminGenerateCode() {
+            const targetId = document.getElementById('adminIdInput').value.trim().toUpperCase();
+            if (!targetId) {
+                alert("أدخل رمز جهاز العامل أولاً!");
+                return;
+            }
+            const generated = getCorrectActivationCode(targetId);
+            document.getElementById('adminResultDisplay').innerText = "كود التفعيل: " + generated;
+        }
+
+        // ==================== الكود الأساسي لحاسبة Placo المحدثة ====================
+        
         new QRCode(document.getElementById("qrcode"), {
             text: "https://www.facebook.com/abdelhamid31.mansouri31?mibextid=ZbWKwL",
             width: 60, height: 60, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
@@ -350,7 +202,7 @@
                 "name": "RAIL 48 3.00M", "price": 240, "coeff_val": 0.23, "isClickable": true,
                 "altName": "RAIL 70 3.00M", "altPrice": 375
             },
-            {"name":"CHEVILLE 6MM","price":4,"coeff_val":2},
+            {"name":"CHEVILLE","price":4,"coeff_val":2},
             {"name":"VIS 3.5 X 25 MM","price":1.1,"coeff_val":36},
             {"name":"VIS 9.5MM","price":1.6,"coeff_val":3},
             {"name":"Bande à joint","price":4.8,"coeff_val":1.05},
@@ -391,7 +243,7 @@
         function calculateArea() {
             const l = parseFloat(document.getElementById('length').value) || 0;
             const h = parseFloat(document.getElementById('height').value) || 0;
-            document.getElementById('area').innerText = (l * h).toFixed(2);
+            document.getElementById('area').value = (l * h).toFixed(2);
             initTable();
         }
 
@@ -420,17 +272,15 @@
 
             item.name = item.altName;
             item.price = item.altPrice;
-
             item.altName = tempName;
             item.altPrice = tempPrice;
-
             item.currentPrice = item.price;
 
             renderTable();
         }
 
         function initTable() {
-            const area = parseFloat(document.getElementById('area').innerText) || 0;
+            const area = parseFloat(document.getElementById('area').value) || 0;
             const waste = 1 + wasteRates[wasteLevel];
             let ba13QtyRaw = (area / 3.6) * (isKSActive ? 2 : 1) * waste;
             let ba13QtyFinal = Math.ceil(ba13QtyRaw);
@@ -475,7 +325,7 @@
             currentData.forEach((item, index) => {
                 let nameTdCell = item.isClickable 
                     ? `<td style="text-align:right;" class="clickable-material" onclick="toggleMaterialType(${index})">${item.name} 🔄</td>`
-                    : `<td style="text-align:right;">${item.name}</td>`;
+                    : `<td style="text-align:right; padding-right:4px;">${item.name}</td>`;
 
                 tbody.innerHTML += `
                     <tr>
@@ -503,19 +353,18 @@
         function updateSummary() {
             let grandTotal = 0;
             currentData.forEach(item => { grandTotal += (item.qty * item.currentPrice); });
-            const area = parseFloat(document.getElementById('area').innerText) || 0;
+            const area = parseFloat(document.getElementById('area').value) || 0;
             document.getElementById('grandTotal').innerText = Math.round(grandTotal).toLocaleString() + " DA";
             document.getElementById('unitPriceArea').innerText = area > 0 ? Math.round(grandTotal/area).toLocaleString() + " DA" : "0 DA";
         }
 
-        // الدالة الاحترافية البديلة لإنشاء وحفظ ملف PDF المباشر والمتوافق بالكامل مع تطبيقات الأندرويد والهواتف الذكية
         function generateInvoicePDF() {
             const element = document.getElementById("invoiceBlock");
-            element.classList.add("export-mode"); // تحويل العناصر لوضع الطباعة النظيف والأنيق
+            element.classList.add("export-mode");
 
-            const areaVal = document.getElementById('area').innerText;
+            const areaVal = document.getElementById('area').value;
             const opt = {
-                margin:       [10, 10, 10, 10],
+                margin:       [10, 8, 10, 8],
                 filename:     `فاتورة_بلاكو_${areaVal}م2.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 3, useCORS: true, letterRendering: true },
@@ -524,17 +373,18 @@
 
             setTimeout(() => {
                 html2pdf().set(opt).from(element).save().then(() => {
-                    element.classList.remove("export-mode"); // إعادة التطبيق لوضعه الطبيعي بعد حفظ الملف
+                    element.classList.remove("export-mode");
                 }).catch(err => {
                     element.classList.remove("export-mode");
-                    alert("تعذر حفظ ملف PDF، يرجى التحقق من صلاحيات التخزين للتطبيق.");
+                    alert("يرجى التأكد من توفير صلاحيات الحفظ للتطبيق.");
                 });
             }, 150);
         }
 
         function savePrices() { alert("تم حفظ الأسعار."); }
-        window.onload = calculateArea;
+        
+        // التحقق الذكي من التفعيل فور تحميل الصفحة
+        window.onload = checkActivationStatus;
     </script>
 </body>
 </html>
-
